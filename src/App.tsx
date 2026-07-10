@@ -3,10 +3,34 @@ import { Upload, Download, Maximize2, Loader2, Sparkles, Image as ImageIcon, X, 
 import { motion, AnimatePresence } from 'motion/react';
 
 const STYLES = [
-  { id: 'desk', name: '水下冰块激爽', desc: '夏日清凉体验，冰块与清澈水底的透亮质感', gradient: 'from-blue-300 to-blue-500' },
-  { id: 'zen', name: '禅意自然园林', desc: '宁静的绿植、圆润的石子与明媚阳光的完美交织', gradient: 'from-emerald-100 to-emerald-50' },
-  { id: 'picnic', name: '露营野餐时光', desc: '原木餐桌，公园草坪的自然温暖气息', gradient: 'from-amber-100 to-amber-50' },
-  { id: 'mist', name: '雪山旷野自然', desc: '清新旷野，高耸雪山与青翠苔藓的自然呼吸感', gradient: 'from-sky-200 to-emerald-200' },
+  { 
+    id: 'desk', 
+    name: '水下冰块激爽', 
+    desc: '夏日清凉体验，冰块与清澈水底的透亮质感', 
+    prompt: 'premium commercial product photography of the product submerged in crystal-clear water, surrounded by clean transparent ice cubes, delicate floating air bubbles, and soft water ripples under a studio spotlight, refreshing light blue gradient theme, extremely realistic, highly detailed',
+    gradient: 'from-blue-300 to-blue-500' 
+  },
+  { 
+    id: 'zen', 
+    name: '禅意自然园林', 
+    desc: '宁静的绿植、圆润的石子与明媚阳光的完美交织', 
+    prompt: 'minimalist product photography, zen garden theme, the product stands on a smooth flat black river stone, surrounded by elegant green bamboo shoots, small white pebbles, soft warm sunlight filtering through leaves casting natural shadows, peaceful studio background, elegant clean composition',
+    gradient: 'from-emerald-100 to-emerald-50' 
+  },
+  { 
+    id: 'picnic', 
+    name: '露营野餐时光', 
+    desc: '原木餐桌，公园草坪的自然温暖气息', 
+    prompt: 'lifestyle product photography, the product is placed on a light-colored natural wooden picnic table, soft green grassy lawn in the blurred background, warm natural morning sunlight filtering through trees, cozy inviting outdoor vibe, shallow depth of field',
+    gradient: 'from-amber-100 to-amber-50' 
+  },
+  { 
+    id: 'mist', 
+    name: '雪山旷野自然', 
+    desc: '清新旷野，高耸雪山与青翠苔藓的自然呼吸感', 
+    prompt: 'epic outdoor adventure product photography, the product stands on a wet dark volcanic rock covered with green moss, majestic snow-capped mountain ranges and misty pine forests in the blurry atmospheric background, cool moody morning light, crisp clean air, professional adventure styling',
+    gradient: 'from-sky-200 to-emerald-200' 
+  },
   { id: 'wood', name: '山野露营时光', desc: '群山环绕的露营地，草坪与远处的帐篷，清新自然光，电影感', prompt: 'mountain camping, majestic green mountain ranges with rocky ridges under blue sky with soft white clouds, green grassy meadow covered ground with small purple wild flowers, a large detailed tree trunk on the left with a light green triangle camping tent nearby, a person sitting on a camp chair in front of the tent, another person in a blue shirt sitting on the right side, the product stands on a circular rustic wooden tree stump in the middle, hanging green leaves and tree branches framing the top of the image, clear natural sunlight, warm morning glow, cinematic photorealism, shot on 85mm lens, f/1.8, shallow depth of field, blurry background', gradient: 'from-orange-200 to-green-100' },
   { id: 'sunset', name: '田园野餐时光', desc: '原木蛋卷桌、天然藤编篮与清晨阳光草坪的清新野餐感', prompt: 'fresh natural picnic style commercial product photography, medium shot. The product is placed securely in the center on a foldable wooden roll-top picnic egg-roll table with cream-colored legs. On the left side of the product, there is a natural woven rattan basket filled with high-quality Indian turmeric, Ceylon cinnamon, and green apples with a natural sheen. On the right side of the product, half a cut high-quality Indian turmeric showing an irregular orange-red cut surface with clear flesh texture is placed. Very shallow depth of field, with a sunny, completely blurred green grass lawn in the background. On the lawn background, a picnic basket, a flower bouquet containing sunflowers and roses, and some Ceylon cinnamon sticks are softly out of focus. Bright natural diffuse light casting soft shadows of the product and props on the wooden tabletop. The product has a delicate texture, the woven rattan basket has crisp detail, and the fruits look fresh. The color palette consists of soft cream, light blue, pink, grass green, and warm yellow, creating a fresh, pleasant atmosphere with natural light diffusion. Impeccable professional styling, props are balanced around the central product to create a perfect outdoor picnic scene', gradient: 'from-amber-100 to-green-100' },
 ];

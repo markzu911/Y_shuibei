@@ -10,8 +10,11 @@ app.use(express.json({ limit: "50mb" }));
 
 // Helper to get GoogleGenAI client with dynamic/lazy initialization
 function getAiClient() {
-  const userKey = "AIzaSyDd8qy90EjLM3D3hY8PK-kQokalRPUhoZ8";
-  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || userKey;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY 无效或未配置。请在 Vercel 或本地的环境变量中设置 GEMINI_API_KEY。");
+  }
 
   return new GoogleGenAI({
     apiKey,
@@ -184,7 +187,15 @@ app.post("/api/gemini", async (req, res) => {
     const mimeType = match[1];
     const base64Data = match[2];
 
-    const prompt = `Place this product in a ${style} setting. Ensure the lighting, shadows, and reflections are realistic and match the new environment perfectly. The product should remain intact, clear, and the central focus of the image.`;
+    const prompt = `You are a professional product commercial photographer and master image editor. 
+Your task is to take the product from the uploaded image and place it seamlessly into the following setting: "${style}".
+
+CRITICAL INSTRUCTIONS FOR HIGH QUALITY PLACEMENT:
+1. There MUST be EXACTLY ONE instance of the product in the final generated image. Do NOT generate duplicate, floating, or extra copies of the product.
+2. If the setting describes a model or person holding the product, place the product naturally in their hand. Do NOT create a floating bottle next to the person.
+3. Preserve the product's original shape, labels, details, branding, and colors perfectly.
+4. Ensure the lighting, soft shadows, and reflections are highly realistic and perfectly matched to the new environment.
+5. The product should be the absolute main focus of the image, crisp, clean, and beautifully integrated.`;
 
     // Lazy initialize the AI client
     const ai = getAiClient();
