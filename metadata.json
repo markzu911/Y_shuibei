@@ -1,0 +1,6 @@
+{
+  "name": "水杯商品图生成器 (AquaStudio AI)",
+  "description": "上传您的水杯产品图，选择喜欢的六大背景风格、比例和清晰度，一键利用 Gemini AI 生成极具真实感的商品环境图，并支持高清一键下载与全屏放大预览。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
