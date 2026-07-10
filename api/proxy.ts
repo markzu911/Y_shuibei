@@ -52,7 +52,7 @@ const localLaunch = (userId: string) => {
     success: true,
     data: {
       user: { name: `用户_${userId.substring(0, 4)}`, enterprise: "体验企业", integral: currentIntegral },
-      tool: { name: "AI 智能商品生图", integral: TOOL_COST }
+      tool: { name: "智能水杯商品生图", integral: TOOL_COST }
     }
   };
 };

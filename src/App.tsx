@@ -349,7 +349,7 @@ export default function App() {
           <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <span className="text-base font-bold text-slate-900">AquaStudio AI</span>
+          <span className="text-base font-bold text-slate-900">智能水杯商品生图</span>
         </div>
         <div className="flex items-center gap-3">
           {/* 剩余积分展示 */}
