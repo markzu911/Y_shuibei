@@ -39,6 +39,7 @@ interface AgentModeProps {
   processFile: (file: File) => void;
   removeSourceImage: (e: React.MouseEvent) => void;
   handleAbort: () => void;
+  onPreviewImage: (url: string) => void;
 }
 
 interface ChatMessage {
@@ -68,6 +69,7 @@ export default function AgentMode({
   processFile,
   removeSourceImage,
   handleAbort,
+  onPreviewImage,
 }: AgentModeProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -647,7 +649,13 @@ export default function AgentMode({
                     <div className="mt-3.5">
                       {sourceImage ? (
                         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
-                          <img src={sourceImage} alt="已上传" className="w-12 h-12 rounded-lg object-contain bg-white border border-slate-100" />
+                          <img 
+                            src={sourceImage} 
+                            alt="已上传" 
+                            className="w-12 h-12 rounded-lg object-contain bg-white border border-slate-100 cursor-zoom-in hover:opacity-90 transition-all" 
+                            onClick={() => onPreviewImage(sourceImage)}
+                            title="点击放大预览"
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="text-xs font-bold text-slate-800 truncate">已上传原图</div>
                             <div className="text-[10px] text-[#C5A069] font-medium">随时可以开始渲染 🚀</div>
@@ -676,15 +684,59 @@ export default function AgentMode({
 
                   {/* Interactive: One-click synthetic trigger */}
                   {msg.type === 'generate-trigger' && (
-                    <div className="mt-4">
-                      <button
-                        onClick={triggerGenerate}
-                        disabled={isGenerating}
-                        className="w-full py-3 bg-[#C5A069] text-white hover:bg-[#B4905A] disabled:opacity-50 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        🚀 立即开始一键生成商品图
-                      </button>
+                    <div className="mt-4 space-y-4 p-4 bg-slate-50 border border-slate-200/60 rounded-xl max-w-sm shadow-sm">
+                      <div className="text-xs font-bold text-slate-700 flex items-center gap-1.5 border-b border-slate-200/60 pb-2 mb-2">
+                        <span>⚙️ 请选择生成图片的详细参数：</span>
+                      </div>
+                      
+                      {/* Aspect Ratio Selector */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-500 block">📐 图片生成比例 (Aspect Ratio)</span>
+                        <div className="grid grid-cols-5 gap-1">
+                          {aspectRatios.map((ratio) => (
+                            <button
+                              key={ratio.value}
+                              onClick={() => setOptions((prev: any) => ({ ...prev, aspectRatio: ratio.value }))}
+                              className={`py-1.5 text-[10px] rounded-lg border transition-all font-bold text-center
+                                ${options.aspectRatio === ratio.value
+                                  ? 'bg-[#C5A069] border-[#C5A069] text-white shadow-sm'
+                                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
+                            >
+                              {ratio.value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Resolution Selector */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-500 block">🖥️ 图片清晰度 (Resolution)</span>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {resolutions.map((res) => (
+                            <button
+                              key={res.value}
+                              onClick={() => setOptions((prev: any) => ({ ...prev, imageSize: res.value }))}
+                              className={`py-1.5 text-[10px] rounded-lg border transition-all font-bold text-center
+                                ${options.imageSize === res.value
+                                  ? 'bg-[#C5A069] border-[#C5A069] text-white shadow-sm'
+                                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
+                            >
+                              {res.value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200/60">
+                        <button
+                          onClick={triggerGenerate}
+                          disabled={isGenerating}
+                          className="w-full py-3 bg-[#C5A069] text-white hover:bg-[#B4905A] disabled:opacity-50 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          🚀 立即开始一键生成商品图
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -692,11 +744,24 @@ export default function AgentMode({
                   {msg.type === 'result-card' && msg.meta?.result && (
                     <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-md max-w-sm">
                       <div className="relative group/res rounded-t-xl overflow-hidden aspect-square bg-white">
-                        <img src={msg.meta.result} alt="最终渲染图" className="w-full h-full object-contain" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/res:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <img 
+                          src={msg.meta.result} 
+                          alt="最终渲染图" 
+                          className="w-full h-full object-contain cursor-zoom-in hover:opacity-95 transition-all" 
+                          onClick={() => onPreviewImage(msg.meta.result)}
+                          title="点击放大预览"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/res:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
+                          <button
+                            onClick={() => onPreviewImage(msg.meta.result)}
+                            className="p-2 bg-white text-slate-800 rounded-full hover:bg-slate-100 transition-all shadow pointer-events-auto"
+                            title="放大预览"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleDownload(msg.meta.result)}
-                            className="p-2 bg-white text-slate-800 rounded-full hover:bg-slate-100 transition-all shadow"
+                            className="p-2 bg-white text-slate-800 rounded-full hover:bg-slate-100 transition-all shadow pointer-events-auto"
                             title="保存到本地"
                           >
                             <Download className="w-4 h-4" />

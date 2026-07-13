@@ -55,7 +55,7 @@ export default function App() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [lastGeneratedAt, setLastGeneratedAt] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<'agent' | 'expert' | null>(null);
@@ -569,6 +569,7 @@ export default function App() {
               processFile={processFile}
               removeSourceImage={removeSourceImage}
               handleAbort={handleAbort}
+              onPreviewImage={setPreviewImage}
             />
           </div>
         ) : (
@@ -597,12 +598,30 @@ export default function App() {
                         <img 
                           src={sourceImage} 
                           alt="原图" 
-                          className="w-full h-full object-contain rounded-lg" 
+                          className="w-full h-full object-contain rounded-lg cursor-zoom-in hover:opacity-95 transition-all" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewImage(sourceImage);
+                          }}
+                          title="点击放大预览"
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center rounded-lg gap-2 pointer-events-none">
                           <button 
-                            onClick={removeSourceImage}
-                            className="p-2 bg-white/20 text-white rounded-full hover:bg-white/30 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewImage(sourceImage);
+                            }}
+                            className="p-2 bg-white text-slate-800 rounded-full hover:bg-slate-100 transition-colors pointer-events-auto shadow-sm"
+                            title="放大预览"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeSourceImage(e);
+                            }}
+                            className="p-2 bg-white text-slate-800 hover:text-red-500 rounded-full hover:bg-slate-100 transition-colors pointer-events-auto shadow-sm"
                             title="删除"
                           >
                             <X className="w-4 h-4" />
@@ -619,6 +638,58 @@ export default function App() {
                       </div>
                     )}
                   </div>
+
+                  {sourceImage && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-3 p-3 bg-white border border-[#E5E0D8]/60 rounded-xl space-y-3.5 shadow-sm"
+                    >
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 pb-1.5 border-b border-slate-100">
+                        <span>⚙️ 快速配置生成参数：</span>
+                      </div>
+                      
+                      {/* Aspect Ratio in section 1 */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-500 block">📐 比例选择 (Aspect Ratio)</span>
+                        <div className="grid grid-cols-5 gap-1">
+                          {ASPECT_RATIOS.map((ratio) => (
+                            <button
+                              type="button"
+                              key={ratio.value}
+                              onClick={() => setOptions({ ...options, aspectRatio: ratio.value })}
+                              className={`py-1 text-[10px] rounded-lg transition-all border font-bold text-center
+                                ${options.aspectRatio === ratio.value
+                                  ? 'border-[#C5A069] bg-[#C5A069] text-white shadow-sm'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-[#C5A069]'}`}
+                            >
+                              {ratio.value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Resolution in section 1 */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-500 block">🖥️ 清晰度选择 (Resolution)</span>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {RESOLUTIONS.map((res) => (
+                            <button
+                              type="button"
+                              key={res.value}
+                              onClick={() => setOptions({ ...options, imageSize: res.value })}
+                              className={`py-1 text-[10px] rounded-lg transition-all border font-bold text-center
+                                ${options.imageSize === res.value
+                                  ? 'border-[#C5A069] bg-[#C5A069] text-white shadow-sm'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:border-[#C5A069]'}`}
+                            >
+                              {res.value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </section>
 
                 {/* 2. Generation Mode */}
@@ -935,11 +1006,24 @@ export default function App() {
                   </div>
                 ) : generatedImage ? (
                   <div className="w-full max-w-2xl flex-1 flex flex-col items-center justify-center p-8 min-h-0">
-                    <img 
-                      src={generatedImage} 
-                      alt="生成的最终商品图" 
-                      className="max-w-full max-h-full object-contain rounded-2xl shadow-sm"
-                    />
+                    <div className="relative group/gen max-w-full max-h-[85%] rounded-2xl overflow-hidden shadow-sm flex items-center justify-center bg-white border border-slate-100">
+                      <img 
+                        src={generatedImage} 
+                        alt="生成的最终商品图" 
+                        className="max-w-full max-h-full object-contain cursor-zoom-in hover:opacity-95 transition-all"
+                        onClick={() => setPreviewImage(generatedImage)}
+                        title="点击放大预览"
+                      />
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/gen:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                        <button
+                          onClick={() => setPreviewImage(generatedImage)}
+                          className="p-3 bg-white text-slate-800 rounded-full hover:bg-slate-50 transition-all shadow-lg pointer-events-auto flex items-center gap-1.5 font-bold text-xs"
+                          title="放大预览"
+                        >
+                          <Eye className="w-4 h-4" /> 放大预览
+                        </button>
+                      </div>
+                    </div>
                     <button 
                       onClick={handleDownload}
                       className="mt-6 flex items-center gap-2 bg-[#C5A069] hover:bg-[#B4905A] text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow-md transition-all active:scale-95"
@@ -969,16 +1053,17 @@ export default function App() {
 
       {/* Fullscreen Preview Modal */}
       <AnimatePresence>
-        {isPreviewOpen && generatedImage && (
+        {previewImage && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 cursor-zoom-out"
+            onClick={() => setPreviewImage(null)}
           >
             <button 
-              onClick={() => setIsPreviewOpen(false)}
-              className="absolute top-6 right-6 p-2.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all backdrop-blur"
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-6 right-6 p-2.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all backdrop-blur z-50"
               title="关闭全屏预览"
             >
               <X className="w-5 h-5" />
@@ -988,9 +1073,10 @@ export default function App() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              src={generatedImage}
+              src={previewImage}
               alt="全屏商品图放大预览"
               className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             />
           </motion.div>
         )}
