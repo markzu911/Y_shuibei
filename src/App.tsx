@@ -618,14 +618,6 @@ export default function App() {
                         <span className="text-[10px] text-slate-400 mt-1">支持 JPG / PNG，建议尺寸 1:1</span>
                       </div>
                     )}
-                    
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      onChange={handleFileChange} 
-                      accept="image/*" 
-                      className="hidden" 
-                    />
                   </div>
                 </section>
 
@@ -1003,6 +995,15 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Global File Input for uploading images */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept="image/*" 
+        className="hidden" 
+      />
     </div>
   );
 }
