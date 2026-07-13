@@ -692,6 +692,19 @@ export default function App() {
             </div>
           </div>
 
+          {error && (
+            <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm flex items-start gap-2.5 shadow-sm">
+              <span className="text-base leading-none">⚠️</span>
+              <div className="flex-1">
+                <p className="font-bold mb-1">操作失败</p>
+                <p className="text-red-700 leading-relaxed text-xs">{error}</p>
+              </div>
+              <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 font-bold text-xs shrink-0 ml-2">
+                关闭
+              </button>
+            </div>
+          )}
+
           {/* Center Image Canvas */}
           <div className="flex-1 p-6 flex flex-col items-center justify-center">
             {isGenerating ? (
