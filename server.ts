@@ -29,7 +29,7 @@ async function startServer() {
   const PORT = 3000;
 
   // Increase payload limit for base64 image uploads
-  app.use(express.json({ limit: "50mb" }));
+  app.use(express.json({ limit: "20mb" }));
 
   // In-memory store for SaaS point and upload simulation
   const userPointsStore = new Map<string, number>();
@@ -125,7 +125,7 @@ async function startServer() {
   });
 
   // D2. 图片直传代理接收 (proxy-put)
-  app.put("/api/upload/proxy-put", express.raw({ type: "*/*", limit: "50mb" }), (req, res) => {
+  app.put("/api/upload/proxy-put", express.raw({ type: "*/*", limit: "20mb" }), (req, res) => {
     try {
       res.status(200).send({ success: true });
     } catch (err: any) {

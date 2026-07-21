@@ -151,16 +151,53 @@ export default function App() {
 
   const processFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setError('请选择有效的图片文件 (PNG 或 JPG)。');
+      setError('请选择有效的图片文件 (JPG, PNG, WebP)。');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      setSourceImage(event.target?.result as string);
-      setGeneratedImage(null);
-      setLastGeneratedAt(null);
-      setError(null);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // 计算缩放比例 (最大长边 1600px)
+        const MAX_SIZE = 1600;
+        if (width > height && width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        } else if (height > width && height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          setError('图片处理失败：无法获取 canvas 上下文。');
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+        setSourceImage(compressedBase64);
+        setGeneratedImage(null);
+        setLastGeneratedAt(null);
+        setError(null);
+      };
+      
+      img.onerror = () => {
+        setError('图片加载失败，请重试。');
+      };
+      
+      if (typeof event.target?.result === 'string') {
+        img.src = event.target.result;
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -215,7 +252,7 @@ export default function App() {
         throw new Error(cleanMsg);
       }
 
-      setStatusMessage('正在合成商品图，请稍候...');
+      setStatusMessage(`正在合成商品图 (比例: ${activeOptions.aspectRatio} | 清晰度: ${activeOptions.imageSize})，请稍候...`);
 
       // Step 2: 调用 Gemini API 生图
       const selectedStyle = STYLES.find(s => s.id === activeOptions.style);
@@ -418,13 +455,13 @@ export default function App() {
           className="max-w-4xl w-full z-10 flex flex-col items-center"
         >
           {/* Heading */}
-          <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight text-center mb-4 leading-tight">
-            开启您的 AI 智能水杯生图之旅
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight text-center mb-4 leading-tight">
+            水杯产品图
           </h1>
           
           {/* Subtitle */}
-          <p className="text-sm md:text-base text-slate-500 text-center max-w-2xl mb-12 leading-relaxed">
-            无论您是希望得到贴心的智能设计助理引导，还是渴望在全功能的专业面板上精细调校，我们都为您提供了专属的使用方案。
+          <p className="text-sm md:text-base text-slate-500 text-center max-w-2xl mb-12 leading-relaxed font-medium">
+            这款水杯产品图应用，可快速生成高质量水杯产品图，支持替换产品、多风格产品图，让你的商品展示专业又吸引眼球。
           </p>
 
           {/* Two Options */}
@@ -509,7 +546,7 @@ export default function App() {
           <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <span className="text-base font-bold text-slate-900">智能水杯商品生图</span>
+          <span className="text-base font-bold text-slate-900">水杯产品图</span>
         </div>
 
         {/* Dual Mode Switcher */}
@@ -634,7 +671,7 @@ export default function App() {
                           <ImageIcon className="w-4 h-4" />
                         </div>
                         <span className="text-xs font-medium text-slate-700">点击上传或拖拽图片到此处</span>
-                        <span className="text-[10px] text-slate-400 mt-1">支持 JPG / PNG，建议尺寸 1:1</span>
+                        <span className="text-[10px] text-slate-400 mt-1 max-w-[160px]">支持常见图片格式（如 JPG, PNG, WebP），最大支持 20MB（通过前端压缩上传）</span>
                       </div>
                     )}
                   </div>
@@ -1014,6 +1051,17 @@ export default function App() {
                         onClick={() => setPreviewImage(generatedImage)}
                         title="点击放大预览"
                       />
+
+                      {/* Quality & Aspect Ratio Badges */}
+                      <div className="absolute top-4 left-4 flex flex-wrap gap-2 pointer-events-none z-10">
+                        <span className="px-2.5 py-1 bg-slate-900/75 backdrop-blur-sm text-[11px] font-bold text-white rounded-lg border border-white/10 shadow-sm">
+                          📐 比例: {options.aspectRatio}
+                        </span>
+                        <span className="px-2.5 py-1 bg-[#C5A069]/90 backdrop-blur-sm text-[11px] font-bold text-white rounded-lg border border-white/10 shadow-sm">
+                          🖥️ 清晰度: {options.imageSize}
+                        </span>
+                      </div>
+
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/gen:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                         <button
                           onClick={() => setPreviewImage(generatedImage)}

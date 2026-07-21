@@ -316,12 +316,16 @@ export default function AgentMode({
           text: '🎉 您的水杯专属商业商品图渲染完成！整体环境光影、水面质感和杯体反射已达到最佳摄影级水准。您可以通过卡片按钮保存高清图片！',
           timestamp: getNowTime(),
           type: 'result-card',
-          meta: { result: generatedImage }
+          meta: { 
+            result: generatedImage,
+            imageSize: options.imageSize,
+            aspectRatio: options.aspectRatio
+          }
         }
       ]);
     }
     prevGenImageRef.current = generatedImage;
-  }, [generatedImage]);
+  }, [generatedImage, options.imageSize, options.aspectRatio]);
 
   // Free text message handler
   const handleSendMessage = () => {
@@ -676,7 +680,7 @@ export default function AgentMode({
                             <Upload className="w-4 h-4" />
                           </div>
                           <div className="text-xs font-bold text-slate-800 mb-0.5">点击在此处上传产品图</div>
-                          <div className="text-[10px] text-slate-400">支持拖拽图片入内</div>
+                          <div className="text-[10px] text-slate-400 mt-1 max-w-[160px]">支持常见图片格式（如 JPG, PNG, WebP），最大支持 20MB（通过前端压缩上传）</div>
                         </div>
                       )}
                     </div>
@@ -751,6 +755,17 @@ export default function AgentMode({
                           onClick={() => onPreviewImage(msg.meta.result)}
                           title="点击放大预览"
                         />
+                        
+                        {/* Quality & Aspect Ratio Badges */}
+                        <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 pointer-events-none">
+                          <span className="px-2 py-0.5 bg-slate-900/75 backdrop-blur-sm text-[10px] font-bold text-white rounded-md border border-white/10 shadow-sm">
+                            📐 比例: {msg.meta.aspectRatio || '1:1'}
+                          </span>
+                          <span className="px-2 py-0.5 bg-[#C5A069]/90 backdrop-blur-sm text-[10px] font-bold text-white rounded-md border border-white/10 shadow-sm">
+                            🖥️ 清晰度: {msg.meta.imageSize || '2K'}
+                          </span>
+                        </div>
+
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/res:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
                           <button
                             onClick={() => onPreviewImage(msg.meta.result)}
